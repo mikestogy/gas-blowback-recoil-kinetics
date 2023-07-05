@@ -24,6 +24,7 @@ while not connected:
 print("Configure experimental setup:")
 print("Select propellant")
 propellantList = ["Propane", "Propylene", "CO2"]
+print("hu")
 
 for index, propellant in enumerate(propellantList):
     print(f"{index}. {propellant}")
