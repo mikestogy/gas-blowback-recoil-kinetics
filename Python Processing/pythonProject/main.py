@@ -2,36 +2,35 @@ import serial.tools.list_ports
 import configModules
 import time
 
+# Print out active COM ports
 ports = serial.tools.list_ports.comports()
 for port in ports:
     print(port)
 
+# Ask user to input COM port number
 print("Please enter port number:")
 portNumber = input(">")
 portNumber = 'COM' + portNumber
 
-# Arduino serial takes marginally longer to begin, rather than
-# implementing delays, wait for arduino to tell python its ready
+# Establish serial connection. When opened, arduino resets. Arduino will send
+# a message when its serial is ready, so python listens for this message
 serialInst = serial.Serial(port=portNumber, baudrate=115200)
-print("Connecting . . .")
+print("Connecting...")
 connected = False
 while not connected:
     if serialInst.in_waiting:
         rawLine = serialInst.readline().strip().decode()
-        if rawLine == "Serial Ready":       # Arduino sends "Serial Ready" when serial is ready
+        if rawLine == "SR":       # Arduino sends "Serial Ready" when serial is ready
             connected = True
-            print('Connected to Arduino!')
+            print('Connected!')
 
 
-mass_selection = "NA"
-propellant_selection = "NA"
-platform_selection = "NA"
+platform_selection = "GHK AKS-74U"
+propellant_selection = "CO2"
 validExperiment = False
 while not validExperiment:
-    #if configModules.select_mode() == 'Experiment Configuration':
-     #   platform_selection = configModules.select_platform()
-      #  propellant_selection = configModules.select_propellant()
-       # mass_selection = configModules.select_mass()
+    if configModules.select_mode() == 'Experiment Configuration':
+        mass_selection = configModules.select_mass()
         interval_selection = configModules.select_interval()
         print("\nExperiment Summary:")
         print("- " + str(platform_selection))
@@ -44,21 +43,43 @@ while not validExperiment:
                 validExperiment = True
         except ValueError:
             validExperiment = False
-    #else:
-     #   print("not configured, please try another")
+    else:
+        print("Not finished")
 
-experiment = str(interval_selection)
-serialInst.write(experiment.encode('utf-8'))
-print("Uploading experiment. . .")
 
-experiment_uploaded = False
-while not experiment_uploaded:
+send_config = ("CR" + "S" + str(interval_selection) + "I")
+print(send_config)
+serialInst.write(send_config.encode('utf-8'))
+print("Configuration Uploading. . .")
+config_uploaded = False
+while not config_uploaded:
     if serialInst.in_waiting:  # 1 or more characters in the input buffer
         rawLine = serialInst.readline().strip().decode()
-        if rawLine == "Experiment Received":
-            experiment_uploaded = True
+        if rawLine == "CU":
+            config_uploaded = True
+            print("Configuration Uploaded")
 
-print("Experiment uploaded to Arduino!")
+print("\nEnsure platform is unloaded, then press 1 to begin calibration")
+input(">")
+print("\nCalibrating...")
+send_calibration = str("Begin Calibrating")
+serialInst.write(send_calibration.encode('utf-8'))
+calibration_completed = False
+while not calibration_completed:
+    if serialInst.in_waiting:  # 1 or more characters in the input buffer
+        rawLine = serialInst.readline().strip().decode()
+        if rawLine == "CC":
+            calibration_completed = True
+            print("Calibration Complete")
+
+while True:
+    if serialInst.in_waiting:
+        rawLine = serialInst.readline().strip().decode()
+        print(rawLine)
+
+
+
+
 
 
 
@@ -83,6 +104,3 @@ input(">")
 
 print("WARNING - Press 1 to initiate experiment.")
 input(">")'''
-
-
-

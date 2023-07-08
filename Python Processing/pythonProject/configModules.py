@@ -6,7 +6,7 @@ def select_mode():
         print(f"{index + 1}. {mode}")
     while not mode_selected:
         try:
-            mode_selection = int(input())
+            mode_selection = int(input(">"))
             if 0 < mode_selection <= (len(mode_list)):
                 mode_selection = mode_list[mode_selection - 1]
                 mode_selected = True
@@ -48,10 +48,10 @@ def select_propellant():
 
 def select_mass():
     mass_selected = False
-    print("\nSelect Mass of Propellant (g):")
+    print("\nInput Mass of Propellant (g):")
     while not mass_selected:
         try:
-            mass_selection = int(input())
+            mass_selection = int(input(">"))
             if 0 < mass_selection <= 30:
                 mass_selected = True
                 return mass_selection

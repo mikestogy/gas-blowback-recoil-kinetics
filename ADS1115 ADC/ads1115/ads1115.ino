@@ -30,13 +30,9 @@ String msg;
 
 void loop() {
 
-  if (Serial.available() > 0) {
-    msg = Serial.readString();
-  }
-
-  if (msg == "1") {
+ 
     Serial.println((String)micros() + " " + (conversion() - zeroValue));
-  }
+  
 }
 
 
