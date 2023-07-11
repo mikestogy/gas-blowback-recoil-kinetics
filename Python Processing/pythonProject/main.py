@@ -46,7 +46,6 @@ while not validExperiment:
     else:
         print("Not finished")
 
-
 send_config = ("CR" + "S" + str(interval_selection) + "I")
 print(send_config)
 serialInst.write(send_config.encode('utf-8'))
@@ -62,7 +61,7 @@ while not config_uploaded:
 print("\nEnsure platform is unloaded, then press 1 to begin calibration")
 input(">")
 print("\nCalibrating...")
-send_calibration = str("Begin Calibrating")
+send_calibration = str("BC")
 serialInst.write(send_calibration.encode('utf-8'))
 calibration_completed = False
 while not calibration_completed:
@@ -75,32 +74,4 @@ while not calibration_completed:
 while True:
     if serialInst.in_waiting:
         rawLine = serialInst.readline().strip().decode()
-        print(rawLine)
-
-
-
-
-
-
-
-
-
-
-
-
-'''print("\nSending experiment . . .")
-time.sleep(2)
-print("Experiment loaded")
-
-print("\nWARNING - To calibrate, ensure platform is unloaded. Then, press 1.")
-input(">")
-
-print("\nCalibrating platform . . .")
-time.sleep(2)
-print("Calibration complete. Current offset:")
-
-print("WARNING - To continue, arm the platform. Then, press 1.")
-input(">")
-
-print("WARNING - Press 1 to initiate experiment.")
-input(">")'''
+        print("Calibration Offset: " + str(rawLine))

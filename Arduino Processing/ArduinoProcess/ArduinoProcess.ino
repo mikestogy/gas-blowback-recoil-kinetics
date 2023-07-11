@@ -1,19 +1,19 @@
 #include <Wire.h>
 
-int zeroValue = 0;
-
-
+float zeroValue = 0;
 bool config_uploaded = false;
 bool calibrating = false;
-
-
 String shotInterval;
 
 void setup() {
   Serial.begin(115200);
+  pinMode(9, OUTPUT);
+  pinMode(2, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(2), isr, CHANGE);
+  //attachInterrupt(digitalPinToInterrupt(2), isr2, RISING);
+  digitalWrite(9, LOW);
   Wire.begin();
   Wire.setClock(400000);
-
   Serial.println("SR");
 
   byte data[2];
@@ -21,9 +21,8 @@ void setup() {
   int intervalIndex;
   int shotIndex;
 
-  char startFlags[2] = {'C', 'R'};
+  char startFlags[2] = { 'C', 'R' };
   char intervalFlags[2] = { 'S', 'I' };
-  char countFlags[2] = { 'B', 'N' };
 
   while (!config_uploaded) {
     if (Serial.available() > 0) {
@@ -34,42 +33,68 @@ void setup() {
       }
     }
   }
-  Serial.println(configString);
 
+  Serial.println(configString);
   int index1 = configString.indexOf(intervalFlags[0]);
   int index2 = configString.indexOf(intervalFlags[1]);
   String intervalString = configString.substring(index1 + 1, index2);
   Serial.println(intervalString);
 
-  int index3 = configString.indexOf(countFlags[0]);
-  int index4 = configString.indexOf(countFlags[1]);
-  String countString = configString.substring(index3 + 1, index4);
-  Serial.println(countString);
-
   Serial.println("CU");
-
-
-
-
 
   while (!calibrating) {
     if (Serial.available() > 0) {
-      String msg = Serial.readString();
-      Serial.println("CC");
-      for (int i = 0; i < 100; i++) {
-        zeroValue += conversion();
+      String msg = Serial.readStringUntil('\n');
+      if (msg[0] == 'B' and msg[1] == 'C') {
+        calibrating = true;
       }
-      zeroValue = zeroValue / 100;
     }
   }
+
+  configureADS1115();
+  for (int i = 0; i < 10000; i++) {
+    zeroValue += conversion();
+  }
+  zeroValue = zeroValue / 10000;
+  Serial.println("CC");
+
   Serial.println(zeroValue);
+  delay(2000);
 }
 
+int button1Prev = 0;
+int button2Prev = 0;
+bool blowbackStatus = false;
+int previousTime = 0;
+int shotCount = 0;
 void loop() {
 
-  Serial.println(zeroValue);
+  // internal shot counter
+  // report load cell data with shot number
+  // time, shot number, load cell data
+
+  // shot starts when forward bolt switch opens
+  // shot ends when forward sled closes
+  // while forward bolt open, record load cell until forward sled closes
+
+  while (blowbackStatus == true) {
+  Serial.println((String)shotCount + " " +conversion());
+  }
+
 }
 
+void isr() {
+  int currentTime = millis();
+  if (currentTime - previousTime > 1) {
+    if (digitalRead(2) == 1) {
+      blowbackStatus = false;
+    } else {
+      blowbackStatus = true;
+      shotCount++;
+    }
+    previousTime = currentTime;
+  }
+}
 
 void configureADS1115() {
   // Compile write data configure ADS1115
@@ -84,7 +109,6 @@ void configureADS1115() {
   Wire.write(0b00000000);  // Select conversion data register
   Wire.endTransmission();  // Send the request for data
 }
-
 
 int16_t conversion() {
   // Send read request to ADS1115

@@ -5,11 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="37777e3f-f6b0-448e-8d51-e108718aed18" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/testmain.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../ADS1115 ADC/ads1115/ads1115.ino" beforeDir="false" afterPath="$PROJECT_DIR$/../../ADS1115 ADC/ads1115/ads1115.ino" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../Arduino Processing/ArduinoProcess/ArduinoProcess.ino" beforeDir="false" afterPath="$PROJECT_DIR$/../../Arduino Processing/ArduinoProcess/ArduinoProcess.ino" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/configModules.py" beforeDir="false" afterPath="$PROJECT_DIR$/configModules.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
