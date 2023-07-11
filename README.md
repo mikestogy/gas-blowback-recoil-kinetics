@@ -1,4 +1,4 @@
-# analysis-of-pneumatic-recoil-systems
+# gas-blowback-recoil-kinetics
 
 GOAL/OVERVIEW
 
